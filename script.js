@@ -145,4 +145,55 @@ document.addEventListener("DOMContentLoaded", () => {
       }
     }
   });
+
+  // --- Modal Galería ---
+  const modalGaleria = document.querySelector("#modal-galeria");
+  const modalImg = document.querySelector("#modal-img");
+  const modalTitulo = document.querySelector("#modal-titulo");
+  const modalCerrar = document.querySelector("#modal-cerrar");
+  const galeriaItems = document.querySelectorAll(".galeria-item");
+
+  if (modalGaleria && modalImg && modalTitulo && modalCerrar) {
+    galeriaItems.forEach((item) => {
+      item.addEventListener("click", () => {
+        const img = item.querySelector("img");
+        const leyenda = item.querySelector(".galeria-leyenda");
+
+        if (img) {
+          modalImg.src = img.src;
+          modalImg.alt = img.alt;
+          modalTitulo.textContent = leyenda ? leyenda.textContent : "";
+          modalGaleria.classList.add("activo");
+          modalGaleria.setAttribute("aria-hidden", "false");
+          document.body.style.overflow = "hidden"; // Evitar scroll al estar abierto
+        }
+      });
+    });
+
+    const cerrarModal = () => {
+      modalGaleria.classList.remove("activo");
+      modalGaleria.setAttribute("aria-hidden", "true");
+      document.body.style.overflow = "";
+      // Limpiar src para evitar que se vea la imagen anterior al abrir de nuevo
+      setTimeout(() => {
+        modalImg.src = "";
+      }, 300);
+    };
+
+    modalCerrar.addEventListener("click", cerrarModal);
+
+    // Cerrar al hacer clic fuera de la imagen
+    modalGaleria.addEventListener("click", (e) => {
+      if (e.target === modalGaleria) {
+        cerrarModal();
+      }
+    });
+
+    // Cerrar con tecla Escape
+    document.addEventListener("keydown", (e) => {
+      if (e.key === "Escape" && modalGaleria.classList.contains("activo")) {
+        cerrarModal();
+      }
+    });
+  }
 });

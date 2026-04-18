@@ -241,7 +241,106 @@ img {
 @media (max-width: 640px) {
   .hero::before {
     background-position: center 18%;
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-color: #fdf2f5;
   }
+  
+  .hero {
+    min-height: 500px;
+  }
+
+  .hero-contenido {
+    background: rgba(253, 242, 245, 0.4);
+    backdrop-filter: blur(2px);
+    padding: 2rem 1rem;
+  }
+}
+
+/* Modal Galería */
+.modal-galeria {
+  position: fixed;
+  inset: 0;
+  z-index: 2000;
+  background: rgba(31, 26, 40, 0.95);
+  backdrop-filter: blur(8px);
+  display: grid;
+  place-items: center;
+  padding: 2rem;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.3s ease, visibility 0.3s ease;
+}
+
+.modal-galeria.activo {
+  opacity: 1;
+  visibility: visible;
+}
+
+.modal-contenido {
+  position: relative;
+  max-width: 900px;
+  width: 100%;
+  max-height: 85vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.5rem;
+}
+
+.modal-imagen {
+  width: 100%;
+  height: auto;
+  max-height: 70vh;
+  object-fit: contain;
+  border-radius: var(--radio);
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+}
+
+.modal-info {
+  color: #fff;
+  text-align: center;
+}
+
+.modal-info h3 {
+  color: #fff;
+  margin-bottom: 0.5rem;
+  font-size: 1.5rem;
+}
+
+.modal-cerrar {
+  position: absolute;
+  top: -3rem;
+  right: 0;
+  background: var(--color-marca);
+  color: #fff;
+  border: none;
+  width: 40px;
+  height: 40px;
+  border-radius: var(--radio-pill);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.5rem;
+  transition: transform 0.2s ease, background 0.2s ease;
+  box-shadow: 0 4px 12px rgba(196, 113, 156, 0.3);
+}
+
+.modal-cerrar:hover {
+  transform: scale(1.1);
+  background: var(--color-marca-2);
+}
+
+@media (max-width: 768px) {
+  .modal-cerrar {
+    top: -3.5rem;
+    right: 0;
+  }
+}
+
+.galeria-item {
+  cursor: pointer;
 }
 
 .hero-overlay {
@@ -451,18 +550,13 @@ img {
 .galeria-grid {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
-  gap: 1.5rem;
+  gap: 1.25rem;
 }
 
-@media (min-width: 700px) {
+@media (min-width: 900px) {
   .galeria-grid {
-    grid-template-columns: repeat(4, 1fr);
-    grid-template-rows: repeat(2, minmax(200px, 280px));
-    gap: 1.75rem;
-  }
-
-  .galeria-item--wide {
-    grid-column: span 2;
+    grid-template-columns: repeat(5, 1fr); /* 5 columnas para que cada uno sea vertical de lado a lado */
+    gap: 1.5rem;
   }
 }
 
@@ -471,31 +565,28 @@ img {
   margin: 0;
   border-radius: var(--radio);
   overflow: hidden;
-  background: linear-gradient(145deg, var(--color-fondo-alt), #e8dce8);
+  background: linear-gradient(145deg, var(--color-fondo-alt), #fdf2f5);
   box-shadow: var(--sombra);
-  aspect-ratio: 1;
-  min-height: 180px;
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  aspect-ratio: 9 / 16; /* Formato vertical tipo TikTok/Reels */
+  min-height: 280px;
+  transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275), box-shadow 0.3s ease;
 }
 
 .galeria-item:hover {
-  transform: translateY(-5px);
+  transform: translateY(-8px) scale(1.02);
   box-shadow: var(--sombra-hover);
-}
-
-.galeria-item--wide {
-  aspect-ratio: 2 / 1;
+  z-index: 10;
 }
 
 .galeria-item img {
   width: 100%;
   height: 100%;
   object-fit: cover;
-  transition: transform 0.5s ease;
+  transition: transform 0.6s ease;
 }
 
 .galeria-item:hover img {
-  transform: scale(1.05);
+  transform: scale(1.1);
 }
 
 .galeria-leyenda {
@@ -503,13 +594,15 @@ img {
   bottom: 0;
   left: 0;
   right: 0;
-  padding: 1rem;
-  background: linear-gradient(transparent, rgba(31, 26, 40, 0.8));
+  padding: 1.5rem 1rem 1rem;
+  background: linear-gradient(transparent, rgba(136, 68, 102, 0.9)); /* Rosa oscuro que contrasta */
   color: #fff;
-  font-size: 0.85rem;
+  font-size: 0.9rem;
   font-weight: 600;
+  text-align: center;
   transform: translateY(100%);
   transition: transform 0.3s ease;
+  backdrop-filter: blur(2px);
 }
 
 .galeria-item:hover .galeria-leyenda {
