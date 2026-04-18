@@ -146,53 +146,123 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   });
 
-  // --- Modal Galería ---
+  // --- Modal Galería y Productos (Álbumes) ---
   const modalGaleria = document.querySelector("#modal-galeria");
   const modalImg = document.querySelector("#modal-img");
   const modalTitulo = document.querySelector("#modal-titulo");
   const modalCerrar = document.querySelector("#modal-cerrar");
-  const galeriaItems = document.querySelectorAll(".galeria-item");
+  const modalPrev = document.querySelector("#modal-prev");
+  const modalNext = document.querySelector("#modal-next");
+  const modalIndicadores = document.querySelector("#modal-indicadores");
+  const albumItems = document.querySelectorAll(".galeria-item, .producto-card");
+
+  let currentAlbum = [];
+  let currentAlbumIndex = 0;
 
   if (modalGaleria && modalImg && modalTitulo && modalCerrar) {
-    galeriaItems.forEach((item) => {
-      item.addEventListener("click", () => {
-        const img = item.querySelector("img");
-        const leyenda = item.querySelector(".galeria-leyenda");
+    const updateAlbumContent = (index) => {
+      if (currentAlbum.length === 0) return;
+      
+      modalImg.style.opacity = "0";
+      setTimeout(() => {
+        modalImg.src = currentAlbum[index];
+        modalImg.style.opacity = "1";
+      }, 150);
+      
+      currentAlbumIndex = index;
+      
+      const puntos = modalIndicadores.querySelectorAll(".modal-punto");
+      puntos.forEach((p, i) => {
+        p.classList.toggle("activo", i === index);
+      });
 
-        if (img) {
-          modalImg.src = img.src;
-          modalImg.alt = img.alt;
-          modalTitulo.textContent = leyenda ? leyenda.textContent : "";
+      if (currentAlbum.length <= 1) {
+        modalPrev.style.display = "none";
+        modalNext.style.display = "none";
+        modalIndicadores.style.display = "none";
+      } else {
+        modalPrev.style.display = "flex";
+        modalNext.style.display = "flex";
+        modalIndicadores.style.display = "flex";
+      }
+    };
+
+    albumItems.forEach((item) => {
+      item.addEventListener("click", () => {
+        const albumData = item.getAttribute("data-album");
+        const titulo = item.querySelector(".galeria-leyenda") || item.querySelector("h3");
+        
+        if (albumData) {
+          currentAlbum = albumData.split(",");
+          currentAlbumIndex = 0;
+          modalTitulo.textContent = titulo ? titulo.textContent : "";
+          
+          modalIndicadores.innerHTML = "";
+          if (currentAlbum.length > 1) {
+            currentAlbum.forEach((_, i) => {
+              const punto = document.createElement("div");
+              punto.classList.add("modal-punto");
+              if (i === 0) punto.classList.add("activo");
+              punto.addEventListener("click", () => updateAlbumContent(i));
+              modalIndicadores.appendChild(punto);
+            });
+          }
+
+          updateAlbumContent(0);
           modalGaleria.classList.add("activo");
           modalGaleria.setAttribute("aria-hidden", "false");
-          document.body.style.overflow = "hidden"; // Evitar scroll al estar abierto
+          document.body.style.overflow = "hidden";
         }
       });
+    });
+
+    const nextAlbumImg = () => {
+      let nextIndex = (currentAlbumIndex + 1) % currentAlbum.length;
+      updateAlbumContent(nextIndex);
+    };
+
+    const prevAlbumImg = () => {
+      let prevIndex = (currentAlbumIndex - 1 + currentAlbum.length) % currentAlbum.length;
+      updateAlbumContent(prevIndex);
+    };
+
+    modalNext?.addEventListener("click", (e) => {
+      e.stopPropagation();
+      nextAlbumImg();
+    });
+
+    modalPrev?.addEventListener("click", (e) => {
+      e.stopPropagation();
+      let prevIndex = (currentAlbumIndex - 1 + currentAlbum.length) % currentAlbum.length;
+      updateAlbumContent(prevIndex);
     });
 
     const cerrarModal = () => {
       modalGaleria.classList.remove("activo");
       modalGaleria.setAttribute("aria-hidden", "true");
       document.body.style.overflow = "";
-      // Limpiar src para evitar que se vea la imagen anterior al abrir de nuevo
       setTimeout(() => {
         modalImg.src = "";
+        currentAlbum = [];
       }, 300);
     };
 
     modalCerrar.addEventListener("click", cerrarModal);
 
-    // Cerrar al hacer clic fuera de la imagen
     modalGaleria.addEventListener("click", (e) => {
-      if (e.target === modalGaleria) {
+      if (e.target === modalGaleria || e.target.classList.contains("modal-nav-container")) {
         cerrarModal();
       }
     });
 
-    // Cerrar con tecla Escape
     document.addEventListener("keydown", (e) => {
-      if (e.key === "Escape" && modalGaleria.classList.contains("activo")) {
-        cerrarModal();
+      if (!modalGaleria.classList.contains("activo")) return;
+      
+      if (e.key === "Escape") cerrarModal();
+      if (e.key === "ArrowRight") nextAlbumImg();
+      if (e.key === "ArrowLeft") {
+        let prevIndex = (currentAlbumIndex - 1 + currentAlbum.length) % currentAlbum.length;
+        updateAlbumContent(prevIndex);
       }
     });
   }
