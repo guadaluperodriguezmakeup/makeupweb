@@ -101,42 +101,30 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     try {
-      const body = new FormData(form);
-      const res = await fetch(form.action, {
+      const payload = { nombre, correo, mensaje };
+      const res = await fetch("/enviar-mensaje", {
         method: "POST",
-        body,
+        body: JSON.stringify(payload),
         headers: {
+          "Content-Type": "application/json",
           Accept: "application/json",
         },
       });
 
-      const contentType = res.headers.get("content-type") || "";
-      let data = null;
-      if (contentType.includes("application/json")) {
-        data = await res.json();
-      }
+      const data = await res.json();
 
       if (data && data.estado === "ok") {
         mensajeElemento.textContent = data.mensaje || "Mensaje enviado. Gracias.";
         mensajeElemento.classList.add("form-mensaje--exito");
         form.reset();
-      } else if (data && data.estado === "error") {
-        mensajeElemento.textContent =
-          data.mensaje || "No se pudo enviar. Configura el servidor o inténtalo más tarde.";
-        mensajeElemento.classList.add("form-mensaje--error");
-      } else if (res.ok) {
-        mensajeElemento.textContent =
-          "Mensaje recibido. Si no ves confirmación del servidor, revisa la configuración de correo.";
-        mensajeElemento.classList.add("form-mensaje--exito");
-        form.reset();
       } else {
-        mensajeElemento.textContent =
-          "Error al enviar. Comprueba que el formulario esté en un servidor con PHP o contacta por WhatsApp.";
+        mensajeElemento.textContent = data.mensaje || "Error al enviar. Inténtalo más tarde.";
         mensajeElemento.classList.add("form-mensaje--error");
       }
-    } catch {
+    } catch (err) {
+      console.error("Error:", err);
       mensajeElemento.textContent =
-        "No hay conexión con el servidor (¿abriste el HTML directamente?). Usa un servidor local o escribe por WhatsApp.";
+        "No se pudo conectar con el servidor de registro. Asegúrate de que el servidor Node.js esté corriendo.";
       mensajeElemento.classList.add("form-mensaje--error");
     } finally {
       if (botonEnviar) {
