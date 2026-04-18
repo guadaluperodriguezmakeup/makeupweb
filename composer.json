@@ -1,0 +1,11 @@
+{
+  "name": "guadalupe-rodriguez/web",
+  "description": "Sitio web — formulario de contacto",
+  "require": {
+    "php": ">=8.0",
+    "phpmailer/phpmailer": "^6.9"
+  },
+  "config": {
+    "optimize-autoloader": true
+  }
+}
