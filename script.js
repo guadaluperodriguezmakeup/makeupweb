@@ -196,4 +196,35 @@ document.addEventListener("DOMContentLoaded", () => {
       }
     });
   }
+
+  // --- Navegación Galería (Slider) ---
+  const galeriaGrid = document.querySelector(".galeria-grid");
+  const btnPrev = document.querySelector(".galeria-nav--prev");
+  const btnNext = document.querySelector(".galeria-nav--next");
+
+  if (galeriaGrid && btnPrev && btnNext) {
+    const scrollAmount = 300; // Cantidad aproximada de scroll
+
+    btnNext.addEventListener("click", () => {
+      galeriaGrid.scrollBy({ left: scrollAmount, behavior: "smooth" });
+    });
+
+    btnPrev.addEventListener("click", () => {
+      galeriaGrid.scrollBy({ left: -scrollAmount, behavior: "smooth" });
+    });
+
+    // Ocultar botones si no hay scroll posible (opcional)
+    const toggleButtons = () => {
+      btnPrev.style.opacity = galeriaGrid.scrollLeft <= 0 ? "0.3" : "1";
+      btnPrev.style.pointerEvents = galeriaGrid.scrollLeft <= 0 ? "none" : "auto";
+      
+      const maxScroll = galeriaGrid.scrollWidth - galeriaGrid.clientWidth;
+      btnNext.style.opacity = galeriaGrid.scrollLeft >= maxScroll ? "0.3" : "1";
+      btnNext.style.pointerEvents = galeriaGrid.scrollLeft >= maxScroll ? "none" : "auto";
+    };
+
+    galeriaGrid.addEventListener("scroll", toggleButtons);
+    window.addEventListener("resize", toggleButtons);
+    toggleButtons();
+  }
 });
